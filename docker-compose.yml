@@ -1,15 +1,34 @@
 version: "3.8"
 name: redocs
 services:
-  redocs:
-    container_name: redocs
-    image: redocs:1.0.0
+  redocs_db:
+    container_name: redocs_db
+    image: mysql:8.0
+    env_file: .env
+    environment:
+      - TZ=America/Argentina/Buenos_Aires
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+    restart: always
+    ports:
+      - ${DB_PORT}:3306
+    volumes:
+      - ./database/mysql:/var/lib/mysql
+      - ./database/backups:/backups
+      - ./database/my.cnf:/etc/my.cnf
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  redocs_app:
+    container_name: redocs_app
+    image: redocs_app:1.0.0
     build:
       context: .
       target: base
-      dockerfile: ./docker/Dockerfile
+      dockerfile: ./app/docker/Dockerfile
     command: bash /start.sh
-    # command: bash -c "tail -f /dev/null"
     restart: always
     env_file: .env
     environment:
@@ -17,7 +36,7 @@ services:
     ports:
       - ${PORT}:${PORT}
     volumes:
-      - .:/app
-      - ./docker/start.sh:/start.sh
+      - ./app:/app
+      - ./app/docker/start.sh:/start.sh
     extra_hosts:
       - host.docker.internal:host-gateway
