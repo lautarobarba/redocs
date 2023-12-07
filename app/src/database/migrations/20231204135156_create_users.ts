@@ -6,7 +6,10 @@ export async function up(knex: Knex): Promise<void> {
     .createTable("users", function (table) {
       table.increments("id").primary();
       table.string("email", 255).unique().notNullable();
+      table.boolean("is_email_verified").defaultTo(false).notNullable();
       table.string("password", 255).unique().notNullable();
+      table.string("firstname", 255).nullable();
+      table.string("lastname", 255).nullable();
       table.timestamps();
       table.datetime("deleted_at").defaultTo(null).nullable();
     })

@@ -1,5 +1,5 @@
-// import Knex from "knex";
+import Knex from "knex";
 import config from "./knex.config";
-const knexClient = require("knex")(config.development);
 
+const knexClient = Knex(config);
 export default knexClient;
